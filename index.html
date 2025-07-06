@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ruleta Casino</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>🎰 Ruleta Casino</h1>
+
+    <input id="playerName" type="text" placeholder="Tu nombre" />
+    <p id="dinero">💰 Dinero: $1000</p>
+    <p id="jugadas">🎯 Jugadas restantes: 5</p>
+
+    <button id="spinBtn">Girar ruleta</button>
+    <p id="resultado"></p>
+
+    <h2>🏆 Tabla de posiciones</h2>
+    <ul id="ranking"></ul>
+  </div>
+
+  <script src="firebase-config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
