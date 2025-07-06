@@ -1,0 +1,47 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #1b1b1b;
+  color: #fff;
+  text-align: center;
+  padding: 20px;
+}
+
+.container {
+  max-width: 400px;
+  margin: auto;
+  background: #2e2e2e;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+input {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  margin-bottom: 10px;
+}
+
+button {
+  background-color: #00b894;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: gray;
+}
+
+#ranking {
+  list-style: none;
+  padding: 0;
+}
+
+#ranking li {
+  background: #444;
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 8px;
+}
