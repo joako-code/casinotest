@@ -1,78 +1,57 @@
-let dinero = 1000;
-let jugadas = 5;
+let saldo = 1000;
+let apuestaSeleccionada = null;
 
-const dineroEl = document.getElementById("dinero");
-const jugadasEl = document.getElementById("jugadas");
+const saldoEl = document.getElementById("saldo");
 const resultadoEl = document.getElementById("resultado");
-const spinBtn = document.getElementById("spinBtn");
-const rankingEl = document.getElementById("ranking");
+const montoInput = document.getElementById("monto");
 
-function actualizarUI() {
-  dineroEl.textContent = `💰 Dinero: $${dinero}`;
-  jugadasEl.textContent = `🎯 Jugadas restantes: ${jugadas}`;
-}
+document.querySelectorAll(".apuesta-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    // Marcar selección
+    document.querySelectorAll(".apuesta-btn").forEach(b => b.classList.remove("seleccionada"));
+    btn.classList.add("seleccionada");
 
-function girarRuleta() {
-  if (jugadas <= 0) return;
-
-  jugadas--;
-  const rand = Math.random();
-  let mensaje = "";
-  let cambio = 0;
-
-  if (rand < 0.10) {
-    cambio = 1000;
-    mensaje = "¡Verde! Ganaste $1000";
-  } else if (rand < 0.50) {
-    cambio = -200;
-    mensaje = "Rojo. Perdiste $200";
-  } else if (rand < 0.90) {
-    cambio = 400;
-    mensaje = "Negro. Ganaste $400";
-  } else {
-    cambio = -dinero;
-    mensaje = "¡Amarillo! Perdiste todo 💀";
-  }
-
-  dinero += cambio;
-  if (dinero < 0) dinero = 0;
-
-  resultadoEl.textContent = mensaje;
-  actualizarUI();
-
-  if (jugadas === 0) {
-    spinBtn.disabled = true;
-    subirPuntaje();
-  }
-}
-
-function subirPuntaje() {
-  const nombre = document.getElementById("playerName").value.trim();
-  if (!nombre) return alert("Poné tu nombre antes de jugar");
-
-  db.collection("puntajes").doc(nombre).set({
-    dinero,
-    timestamp: Date.now()
+    // Guardar apuesta
+    apuestaSeleccionada = {
+      tipo: btn.dataset.tipo,
+      valor: btn.dataset.valor
+    };
   });
+});
 
-  resultadoEl.textContent += " - Juego terminado.";
+document.getElementById("girarBtn").addEventListener("click", () => {
+  const monto = parseInt(montoInput.value);
+
+  if (!apuestaSeleccionada) return alert("Elegí una apuesta primero.");
+  if (isNaN(monto) || monto <= 0) return alert("Ingresá un monto válido.");
+  if (monto > saldo) return alert("No tenés suficiente saldo.");
+
+  // Restar saldo
+  saldo -= monto;
+
+  // Resultado ruleta
+  const numero = Math.floor(Math.random() * 37); // 0 a 36
+  const color = numero === 0 ? "verde" : (esRojo(numero) ? "rojo" : "negro");
+  const paridad = numero === 0 ? "ninguna" : (numero % 2 === 0 ? "par" : "impar");
+
+  // Evaluar
+  let ganancia = 0;
+
+  if (apuestaSeleccionada.tipo === "color" && apuestaSeleccionada.valor === color) {
+    ganancia = monto * 2;
+  } else if (apuestaSeleccionada.tipo === "paridad" && apuestaSeleccionada.valor === paridad) {
+    ganancia = monto * 2;
+  } else if (apuestaSeleccionada.tipo === "numero" && parseInt(apuestaSeleccionada.valor) === numero) {
+    ganancia = monto * 36;
+  }
+
+  saldo += ganancia;
+
+  resultadoEl.textContent = `🎡 Salió el ${numero} (${color}, ${paridad}). ${ganancia > 0 ? "Ganaste $" + ganancia + "!" : "Perdiste."}`;
+  saldoEl.textContent = `Saldo: $${saldo}`;
+});
+
+function esRojo(n) {
+  const rojos = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+  return rojos.includes(n);
 }
-
-function cargarRanking() {
-  db.collection("puntajes")
-    .orderBy("dinero", "desc")
-    .limit(10)
-    .onSnapshot((snapshot) => {
-      rankingEl.innerHTML = "";
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        const li = document.createElement("li");
-        li.textContent = `${doc.id}: $${data.dinero}`;
-        rankingEl.appendChild(li);
-      });
-    });
-}
-
-spinBtn.addEventListener("click", girarRuleta);
-actualizarUI();
-cargarRanking();
