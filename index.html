@@ -1,40 +1,35 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ruleta Europea</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ruleta Casino</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="juego">
-    <h1>🎰 Ruleta Europea</h1>
+  <h1>Ruleta Casino</h1>
 
-    <div class="mesa-container">
-      <img src="mesa.jpg" alt="mesa de ruleta" class="mesa-img" />
-
-      <!-- Color -->
-      <button class="apuesta-btn rojo" data-tipo="color" data-valor="rojo">Rojo</button>
-      <button class="apuesta-btn negro" data-tipo="color" data-valor="negro">Negro</button>
-
-      <!-- Par / Impar -->
-      <button class="apuesta-btn par" data-tipo="paridad" data-valor="par">Par</button>
-      <button class="apuesta-btn impar" data-tipo="paridad" data-valor="impar">Impar</button>
-
-      <!-- Números (ejemplo) -->
-      <button class="apuesta-btn numero n5" data-tipo="numero" data-valor="5">5</button>
-      <button class="apuesta-btn numero n17" data-tipo="numero" data-valor="17">17</button>
-      <button class="apuesta-btn numero n32" data-tipo="numero" data-valor="32">32</button>
-    </div>
-
-    <div class="controles">
-      <input type="number" id="monto" placeholder="Monto a apostar" min="1" value="100" />
-      <button id="girarBtn">🎡 Girar Ruleta</button>
-    </div>
-
-    <p id="saldo">Saldo: $1000</p>
-    <p id="resultado">Resultado: -</p>
+  <div id="roulette-container">
+    <div id="wheel"></div>
+    <div id="ball"></div>
   </div>
+
+  <div class="controls">
+    <label for="bet-type">Tipo de apuesta:</label>
+    <select id="bet-type">
+      <option value="number">Número exacto</option>
+      <option value="color">Color</option>
+      <option value="parity">Par / Impar</option>
+      <option value="dozen">Docena</option>
+    </select>
+
+    <label for="bet-value">Valor:</label>
+    <input id="bet-value" type="text" placeholder="Ej: 17, rojo, impar, 2da docena">
+
+    <button onclick="spin()">Girar Ruleta</button>
+  </div>
+
+  <p id="result"></p>
 
   <script src="script.js"></script>
 </body>
