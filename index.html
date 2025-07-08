@@ -1,36 +1,354 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ruleta Casino</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background-color: #111;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      margin-top: 20px;
+    }
+
+    .roulette-container {
+      display: flex;
+      justify-content: center;
+      margin: 30px auto;
+    }
+
+    .wheel-wrapper {
+      position: relative;
+      width: 400px;
+      height: 400px;
+    }
+
+    #wheel {
+      width: 100%;
+      height: 100%;
+      transition: transform 4s cubic-bezier(0.33, 1, 0.68, 1);
+      transform-origin: 50% 50%;
+    }
+
+    .ball {
+      position: absolute;
+      top: 5px;
+      left: 50%;
+      width: 15px;
+      height: 15px;
+      margin-left: -7.5px;
+      background-color: white;
+      border-radius: 50%;
+      z-index: 10;
+    }
+
+    .controls {
+      margin: 20px auto;
+    }
+
+    input, select, button {
+      padding: 8px;
+      margin: 5px;
+      font-size: 1rem;
+      border-radius: 4px;
+      border: none;
+    }
+
+    button {
+      background-color: #28a745;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 1.2rem;
+    }
+
+    /* Estilos para la tabla de apuestas */
+    #bet-table {
+      display: grid;
+      grid-template-columns: 40px repeat(12, 40px);
+      grid-template-rows: repeat(3, 40px) 40px 40px;
+      gap: 2px;
+      width: max-content;
+      margin: 0 auto 20px auto;
+      background: #176a2a;
+      padding: 12px 8px 8px 8px;
+      border-radius: 12px;
+      box-shadow: 0 0 16px #000a;
+    }
+
+    .bet-cell {
+      width: 38px;
+      height: 38px;
+      font-size: 1rem;
+      border: 2px solid #222;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #eee;
+      color: #111;
+      transition: outline 0.2s, box-shadow 0.2s;
+      margin: 0;
+      padding: 0;
+    }
+
+    .bet-cell.selected {
+      outline: 3px solid yellow;
+      box-shadow: 0 0 8px yellow;
+      z-index: 2;
+    }
+
+    .bet-cell[data-value="0"] {
+      background: green;
+      color: white;
+      font-weight: bold;
+      grid-row: 1 / span 3;
+      grid-column: 1;
+      height: 122px;
+    }
+
+    .roulette-table {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: repeat(5, 1fr);
+      gap: 4px;
+      width: 500px;
+      margin: 0 auto 20px auto;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .roulette-table .bet-cell {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      font-size: 1rem;
+      border: 2px solid #222;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: outline 0.2s, box-shadow 0.2s;
+    }
+
+    .roulette-table .bet-cell.selected {
+      outline: 3px solid yellow;
+      box-shadow: 0 0 8px yellow;
+      z-index: 2;
+    }
+
+    .roulette-table .bet-cell[data-value="0"] {
+      grid-column: 1 / 2;
+      grid-row: 1 / span 3;
+      height: 120px;
+      background: green;
+      color: white;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <h1>Ruleta Casino</h1>
+  <h1>Ruleta CHANCHONA🐷</h1>
 
-  <div id="roulette-container">
-    <div id="wheel"></div>
-    <div id="ball"></div>
+  <div class="roulette-container">
+    <div class="wheel-wrapper">
+      <svg id="wheel" viewBox="0 0 400 400"></svg>
+      <div class="ball"></div>
+    </div>
   </div>
 
-  <div class="controls">
-    <label for="bet-type">Tipo de apuesta:</label>
-    <select id="bet-type">
-      <option value="number">Número exacto</option>
-      <option value="color">Color</option>
-      <option value="parity">Par / Impar</option>
-      <option value="dozen">Docena</option>
-    </select>
-
-    <label for="bet-value">Valor:</label>
-    <input id="bet-value" type="text" placeholder="Ej: 17, rojo, impar, 2da docena">
-
-    <button onclick="spin()">Girar Ruleta</button>
+  <!-- Tabla de Apuestas -->
+  <div id="bet-table" class="roulette-table">
+    <!-- Fila 0 -->
+    <button class="bet-cell" data-type="number" data-value="0" style="grid-row: 1; grid-column: 1;">0</button>
+    <!-- Números 1-36 en 3 filas y 12 columnas -->
+    <!-- Se generarán con JS -->
+    <!-- Docenas y otras apuestas especiales -->
+    <button class="bet-cell" data-type="dozen" data-value="1ra docena" style="grid-row: 4; grid-column: 2 / span 4;">1ra Docena</button>
+    <button class="bet-cell" data-type="dozen" data-value="2da docena" style="grid-row: 4; grid-column: 6 / span 4;">2da Docena</button>
+    <button class="bet-cell" data-type="dozen" data-value="3ra docena" style="grid-row: 4; grid-column: 10 / span 4;">3ra Docena</button>
+    <button class="bet-cell" data-type="low" data-value="1-18" style="grid-row: 5; grid-column: 2 / span 2;">1-18</button>
+    <button class="bet-cell" data-type="parity" data-value="par" style="grid-row: 5; grid-column: 4 / span 2;">Par</button>
+    <button class="bet-cell" data-type="color" data-value="rojo" style="grid-row: 5; grid-column: 6 / span 2; background:red; color:white;">Rojo</button>
+    <button class="bet-cell" data-type="color" data-value="negro" style="grid-row: 5; grid-column: 8 / span 2; background:black; color:white;">Negro</button>
+    <button class="bet-cell" data-type="parity" data-value="impar" style="grid-row: 5; grid-column: 10 / span 2;">Impar</button>
+    <button class="bet-cell" data-type="high" data-value="19-36" style="grid-row: 5; grid-column: 12 / span 2;">19-36</button>
   </div>
+
+
+
+    <button onclick="spin()">Girar ruleta</button>
+
 
   <p id="result"></p>
 
-  <script src="script.js"></script>
+  <script>
+    const svg = document.getElementById("wheel");
+    const red = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+    const black = [2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35];
+    const numbers = [
+      0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10,
+      5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26
+    ];
+    const total = numbers.length;
+    const centerX = 200;
+    const centerY = 200;
+    const radius = 190;
+    const textRadius = 160;
+
+    function drawWheel() {
+      svg.innerHTML = "";
+      for (let i = 0; i < total; i++) {
+        const angle = (2 * Math.PI / total) * i;
+        const nextAngle = (2 * Math.PI / total) * (i + 1);
+        const num = numbers[i];
+        const color = red.includes(num) ? 'red' : black.includes(num) ? 'black' : 'green';
+
+        const x1 = centerX + radius * Math.cos(angle);
+        const y1 = centerY + radius * Math.sin(angle);
+        const x2 = centerX + radius * Math.cos(nextAngle);
+        const y2 = centerY + radius * Math.sin(nextAngle);
+
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        const d = `M${centerX},${centerY} L${x1},${y1} A${radius},${radius} 0 0,1 ${x2},${y2} Z`;
+        path.setAttribute("d", d);
+        path.setAttribute("fill", color);
+        svg.appendChild(path);
+
+        const textAngle = angle + (Math.PI / total);
+        const tx = centerX + textRadius * Math.cos(textAngle);
+        const ty = centerY + textRadius * Math.sin(textAngle);
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", tx);
+        text.setAttribute("y", ty);
+        text.setAttribute("fill", "white");
+        text.setAttribute("font-size", "12");
+        text.setAttribute("text-anchor", "middle");
+        text.setAttribute("alignment-baseline", "middle");
+        text.setAttribute("transform", `rotate(${(textAngle * 180 / Math.PI)}, ${tx}, ${ty})`);
+        text.textContent = num;
+        svg.appendChild(text);
+      }
+    }
+
+    drawWheel();
+
+    // Generar botones del 1 al 36
+    const numbersDiv = document.querySelector('#bet-table');
+    for (let i = 1; i <= 36; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'bet-cell';
+      btn.dataset.type = 'number';
+      btn.dataset.value = i;
+      btn.textContent = i;
+      btn.style.width = '40px';
+      btn.style.height = '40px';
+      btn.style.margin = '2px';
+      btn.style.background = red.includes(i) ? 'red' : black.includes(i) ? 'black' : 'white';
+      btn.style.color = red.includes(i) ? 'white' : 'white';
+      numbersDiv.appendChild(btn);
+    }
+
+    let currentRotation = 0; // Agrega esto fuera de la función spin()
+    let selectedBets = [];
+
+    function spin() {
+      const resultP = document.getElementById("result");
+      if (selectedBets.length === 0) {
+        resultP.textContent = "Selecciona al menos una apuesta antes de girar.";
+        return;
+      }
+
+      const vueltas = 6;
+      const randomAngle = Math.floor(Math.random() * 360);
+      currentRotation += 360 * vueltas + randomAngle;
+      svg.style.transform = `rotate(${currentRotation}deg)`;
+
+      const degreesPerSector = 360 / total;
+      const finalAngle = (360 - (currentRotation % 360) - 90 + 360) % 360;
+      const index = Math.floor(finalAngle / degreesPerSector);
+      const landedNumber = numbers[index];
+
+      setTimeout(() => {
+        const color = red.includes(landedNumber)
+          ? "rojo"
+          : black.includes(landedNumber)
+          ? "negro"
+          : "verde";
+        const parity = landedNumber === 0 ? null : landedNumber % 2 === 0 ? "par" : "impar";
+        let dozen = '';
+        if (landedNumber >= 1 && landedNumber <= 12) dozen = '1ra docena';
+        else if (landedNumber >= 13 && landedNumber <= 24) dozen = '2da docena';
+        else if (landedNumber >= 25 && landedNumber <= 36) dozen = '3ra docena';
+
+        let messages = selectedBets.map(bet => {
+          switch (bet.type) {
+            case "number":
+              return parseInt(bet.value) === landedNumber
+                ? `✅ Número ${bet.value}: ¡Ganaste! Salió el ${landedNumber}`
+                : `❌ Número ${bet.value}: Perdiste. Salió el ${landedNumber}`;
+            case "color":
+              return bet.value === color
+                ? `✅ Color ${bet.value}: ¡Ganaste! Salió ${landedNumber} (${color})`
+                : `❌ Color ${bet.value}: Perdiste. Salió ${landedNumber} (${color})`;
+            case "parity":
+              if (landedNumber === 0) {
+                return `❌ ${bet.value}: Perdiste. Salió 0 (ni par ni impar)`;
+              } else {
+                return bet.value === parity
+                  ? `✅ ${bet.value}: ¡Ganaste! Salió ${landedNumber} (${parity})`
+                  : `❌ ${bet.value}: Perdiste. Salió ${landedNumber} (${parity})`;
+              }
+            case "dozen":
+              return bet.value === dozen
+                ? `✅ ${bet.value}: ¡Ganaste! Salió ${landedNumber} (${dozen})`
+                : `❌ ${bet.value}: Perdiste. Salió ${landedNumber} (${dozen})`;
+            case "low":
+              return (landedNumber >= 1 && landedNumber <= 18)
+                ? `✅ 1-18: ¡Ganaste! Salió ${landedNumber}`
+                : `❌ 1-18: Perdiste. Salió ${landedNumber}`;
+            case "high":
+              return (landedNumber >= 19 && landedNumber <= 36)
+                ? `✅ 19-36: ¡Ganaste! Salió ${landedNumber}`
+                : `❌ 19-36: Perdiste. Salió ${landedNumber}`;
+            default:
+              return "";
+          }
+        });
+        resultP.innerHTML = messages.join("<br>");
+      }, 4200);
+    }
+
+    let betTable = document.getElementById('bet-table');
+    betTable.addEventListener('click', function(e) {
+      if (e.target.classList.contains('bet-cell')) {
+        const type = e.target.dataset.type;
+        const value = e.target.dataset.value;
+        const idx = selectedBets.findIndex(b => b.type === type && b.value === value);
+        if (idx >= 0) {
+          selectedBets.splice(idx, 1);
+          e.target.classList.remove("selected");
+        } else {
+          selectedBets.push({ type, value });
+          e.target.classList.add("selected");
+        }
+        // Mostrar apuestas seleccionadas
+        document.getElementById("result").textContent =
+          selectedBets.length
+            ? "Apuestas: " + selectedBets.map(b => `${b.type}: ${b.value}`).join(" | ")
+            : "Selecciona tus apuestas";
+      }
+    });
+  </script>
 </body>
 </html>
