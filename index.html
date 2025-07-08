@@ -114,9 +114,9 @@
       background: green;
       color: white;
       font-weight: bold;
-      grid-row: 1 / span 3;
+      grid-row: 1 / span 1; /* Solo una fila */
       grid-column: 1;
-      height: 122px;
+      height: 38px; /* Igual que los otros */
     }
 
     .roulette-table {
@@ -145,15 +145,6 @@
       outline: 3px solid yellow;
       box-shadow: 0 0 8px yellow;
       z-index: 2;
-    }
-
-    .roulette-table .bet-cell[data-value="0"] {
-      grid-column: 1 / 2;
-      grid-row: 1 / span 3;
-      height: 120px;
-      background: green;
-      color: white;
-      font-weight: bold;
     }
   </style>
 </head>
@@ -185,12 +176,19 @@
     <button class="bet-cell" data-type="high" data-value="19-36" style="grid-row: 5; grid-column: 12 / span 2;">19-36</button>
   </div>
 
-
+  <div id="chips-panel" style="margin: 16px 0;">
+    <button class="chip" data-value="10" style="background:#eee; color:#222;">10</button>
+    <button class="chip" data-value="50" style="background:#f4d35e; color:#222;">50</button>
+    <button class="chip" data-value="100" style="background:#ee964b; color:#222;">100</button>
+    <button class="chip" data-value="500" style="background:#f95738; color:#fff;">500</button>
+  </div>
+  <p id="selected-chip" style="margin-bottom:10px;">Ficha seleccionada: <b>10</b></p>
 
     <button onclick="spin()">Girar ruleta</button>
 
 
   <p id="result"></p>
+  <div id="history" style="margin-top:16px; font-size:1.1rem;"></div>
 
   <script>
     const svg = document.getElementById("wheel");
@@ -261,13 +259,10 @@
 
     let currentRotation = 0; // Agrega esto fuera de la función spin()
     let selectedBets = [];
+    let history = [];
 
     function spin() {
       const resultP = document.getElementById("result");
-      if (selectedBets.length === 0) {
-        resultP.textContent = "Selecciona al menos una apuesta antes de girar.";
-        return;
-      }
 
       const vueltas = 6;
       const randomAngle = Math.floor(Math.random() * 360);
@@ -291,41 +286,42 @@
         else if (landedNumber >= 13 && landedNumber <= 24) dozen = '2da docena';
         else if (landedNumber >= 25 && landedNumber <= 36) dozen = '3ra docena';
 
-        let messages = selectedBets.map(bet => {
-          switch (bet.type) {
-            case "number":
-              return parseInt(bet.value) === landedNumber
-                ? `✅ Número ${bet.value}: ¡Ganaste! Salió el ${landedNumber}`
-                : `❌ Número ${bet.value}: Perdiste. Salió el ${landedNumber}`;
-            case "color":
-              return bet.value === color
-                ? `✅ Color ${bet.value}: ¡Ganaste! Salió ${landedNumber} (${color})`
-                : `❌ Color ${bet.value}: Perdiste. Salió ${landedNumber} (${color})`;
-            case "parity":
-              if (landedNumber === 0) {
-                return `❌ ${bet.value}: Perdiste. Salió 0 (ni par ni impar)`;
-              } else {
-                return bet.value === parity
-                  ? `✅ ${bet.value}: ¡Ganaste! Salió ${landedNumber} (${parity})`
-                  : `❌ ${bet.value}: Perdiste. Salió ${landedNumber} (${parity})`;
-              }
-            case "dozen":
-              return bet.value === dozen
-                ? `✅ ${bet.value}: ¡Ganaste! Salió ${landedNumber} (${dozen})`
-                : `❌ ${bet.value}: Perdiste. Salió ${landedNumber} (${dozen})`;
-            case "low":
-              return (landedNumber >= 1 && landedNumber <= 18)
-                ? `✅ 1-18: ¡Ganaste! Salió ${landedNumber}`
-                : `❌ 1-18: Perdiste. Salió ${landedNumber}`;
-            case "high":
-              return (landedNumber >= 19 && landedNumber <= 36)
-                ? `✅ 19-36: ¡Ganaste! Salió ${landedNumber}`
-                : `❌ 19-36: Perdiste. Salió ${landedNumber}`;
-            default:
-              return "";
-          }
-        });
+        let messages = [];
+        if (selectedBets.length === 0) {
+          messages.push(`Salió el ${landedNumber}`);
+        } else {
+          messages = selectedBets.map(bet => {
+            let win = false;
+            switch (bet.type) {
+              case "number":
+                win = parseInt(bet.value) === landedNumber;
+                break;
+              case "color":
+                win = bet.value === color;
+                break;
+              case "parity":
+                win = landedNumber !== 0 && bet.value === parity;
+                break;
+              case "dozen":
+                win = bet.value === dozen;
+                break;
+              case "low":
+                win = landedNumber >= 1 && landedNumber <= 18;
+                break;
+              case "high":
+                win = landedNumber >= 19 && landedNumber <= 36;
+                break;
+            }
+            return win
+              ? `✅ ${bet.type} ${bet.value} ($${bet.amount}): ¡Ganaste!`
+              : `❌ ${bet.type} ${bet.value} ($${bet.amount}): Perdiste.`;
+          });
+        }
         resultP.innerHTML = messages.join("<br>");
+
+        // Limpiar montos visuales y apuestas
+        document.querySelectorAll('.bet-amount').forEach(el => el.remove());
+        selectedBets = [];
       }, 4200);
     }
 
@@ -334,21 +330,48 @@
       if (e.target.classList.contains('bet-cell')) {
         const type = e.target.dataset.type;
         const value = e.target.dataset.value;
-        const idx = selectedBets.findIndex(b => b.type === type && b.value === value);
-        if (idx >= 0) {
-          selectedBets.splice(idx, 1);
-          e.target.classList.remove("selected");
+        let bet = selectedBets.find(b => b.type === type && b.value === value);
+        if (bet) {
+          bet.amount += selectedChipValue;
         } else {
-          selectedBets.push({ type, value });
-          e.target.classList.add("selected");
+          selectedBets.push({ type, value, amount: selectedChipValue });
         }
+        // Mostrar la cantidad apostada en el botón
+        e.target.querySelector('.bet-amount')?.remove();
+        const span = document.createElement('span');
+        span.className = 'bet-amount';
+        span.style.position = 'absolute';
+        span.style.right = '2px';
+        span.style.bottom = '2px';
+        span.style.background = 'rgba(0,0,0,0.7)';
+        span.style.color = 'yellow';
+        span.style.fontSize = '0.9em';
+        span.style.padding = '1px 4px';
+        span.style.borderRadius = '6px';
+        span.textContent = bet ? bet.amount : selectedChipValue;
+        e.target.style.position = 'relative';
+        e.target.appendChild(span);
+
         // Mostrar apuestas seleccionadas
         document.getElementById("result").textContent =
           selectedBets.length
-            ? "Apuestas: " + selectedBets.map(b => `${b.type}: ${b.value}`).join(" | ")
+            ? "Apuestas: " + selectedBets.map(b => `${b.type}: ${b.value} ($${b.amount})`).join(" | ")
             : "Selecciona tus apuestas";
       }
     });
+
+    // Manejo de fichas
+    let selectedChipValue = 10;
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', function() {
+        selectedChipValue = parseInt(this.dataset.value);
+        document.getElementById('selected-chip').innerHTML = `Ficha seleccionada: <b>${selectedChipValue}</b>`;
+        document.querySelectorAll('.chip').forEach(c => c.style.outline = '');
+        this.style.outline = '3px solid yellow';
+      });
+    });
+    // Selecciona la primera ficha por defecto
+    document.querySelector('.chip').style.outline = '3px solid yellow';
   </script>
 </body>
 </html>
