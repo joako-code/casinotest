@@ -13,30 +13,24 @@
       margin: 0;
       padding: 0;
     }
-
-    h1 {
-      margin-top: 20px;
-    }
-
+    h1 { margin-top: 20px; }
     .roulette-container {
       display: flex;
       justify-content: center;
       margin: 30px auto;
+      position: relative;
     }
-
     .wheel-wrapper {
       position: relative;
       width: 400px;
       height: 400px;
     }
-
     #wheel {
       width: 100%;
       height: 100%;
       transition: transform 4s cubic-bezier(0.33, 1, 0.68, 1);
       transform-origin: 50% 50%;
     }
-
     .ball {
       position: absolute;
       top: 5px;
@@ -48,35 +42,6 @@
       border-radius: 50%;
       z-index: 10;
     }
-
-    .controls {
-      margin: 20px auto;
-    }
-
-    input, select, button {
-      padding: 8px;
-      margin: 5px;
-      font-size: 1rem;
-      border-radius: 4px;
-      border: none;
-    }
-
-    button {
-      background-color: #28a745;
-      color: white;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #218838;
-    }
-
-    #result {
-      margin-top: 20px;
-      font-size: 1.2rem;
-    }
-
-    /* Estilos para la tabla de apuestas */
     #bet-table {
       display: grid;
       grid-template-columns: 40px repeat(12, 40px);
@@ -88,8 +53,8 @@
       padding: 12px 8px 8px 8px;
       border-radius: 12px;
       box-shadow: 0 0 16px #000a;
+      position: relative;
     }
-
     .bet-cell {
       width: 38px;
       height: 38px;
@@ -102,95 +67,110 @@
       transition: outline 0.2s, box-shadow 0.2s;
       margin: 0;
       padding: 0;
+      position: relative;
     }
-
     .bet-cell.selected {
       outline: 3px solid yellow;
       box-shadow: 0 0 8px yellow;
       z-index: 2;
     }
-
     .bet-cell[data-value="0"] {
       background: green;
       color: white;
       font-weight: bold;
-      grid-row: 1 / span 1; /* Solo una fila */
+      grid-row: 1 / span 3;
       grid-column: 1;
-      height: 38px; /* Igual que los otros */
+      height: 120px;
     }
-
-    .roulette-table {
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      grid-template-rows: repeat(5, 1fr);
-      gap: 4px;
-      width: 500px;
-      margin: 0 auto 20px auto;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .roulette-table .bet-cell {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      font-size: 1rem;
-      border: 2px solid #222;
+    .bet-amount {
+      pointer-events: none;
+      font-weight: bold;
+      font-size: 1.1em;
+      background: #222;
+      color: #ffd700;
+      border: 1px solid #fff;
+      position: absolute;
+      right: 2px;
+      bottom: 2px;
+      padding: 1px 4px;
       border-radius: 6px;
+    }
+    #chips-panel {
+      margin: 16px 0;
+    }
+    .chip {
+      width: 48px;
+      height: 48px;
+      font-size: 1.1rem;
+      border-radius: 50%;
+      border: 2px solid #222;
+      margin: 0 8px;
       cursor: pointer;
-      transition: outline 0.2s, box-shadow 0.2s;
+      font-weight: bold;
+      transition: outline 0.2s;
     }
-
-    .roulette-table .bet-cell.selected {
+    .chip.selected, .chip:focus {
       outline: 3px solid yellow;
-      box-shadow: 0 0 8px yellow;
-      z-index: 2;
     }
+    #history-pile {
+      position: absolute;
+      top: 0;
+      right: -90px;
+      width: 48px;
+      height: 220px;
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      padding: 0;
+      background: none;
+      box-shadow: none;
+      border-radius: 0;
+      overflow-y: hidden;
+    }
+    .history-chip {
+      width: 38px;
+      height: 38px;
+      border-radius: 6px;
+      border: 2px solid #222;
+      margin-bottom: 6px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px #000a;
+    }
+    .history-chip.red { background: red; color: white; }
+    .history-chip.black { background: black; color: white; }
+    .history-chip.green { background: green; color: white; }
   </style>
 </head>
 <body>
   <h1>Ruleta CHANCHONA🐷</h1>
-
   <div class="roulette-container">
     <div class="wheel-wrapper">
       <svg id="wheel" viewBox="0 0 400 400"></svg>
       <div class="ball"></div>
     </div>
+    <div id="history-pile"></div>
   </div>
 
-  <!-- Tabla de Apuestas -->
-  <div id="bet-table" class="roulette-table">
-    <!-- Fila 0 -->
-    <button class="bet-cell" data-type="number" data-value="0" style="grid-row: 1; grid-column: 1;">0</button>
-    <!-- Números 1-36 en 3 filas y 12 columnas -->
-    <!-- Se generarán con JS -->
-    <!-- Docenas y otras apuestas especiales -->
-    <button class="bet-cell" data-type="dozen" data-value="1ra docena" style="grid-row: 4; grid-column: 2 / span 4;">1ra Docena</button>
-    <button class="bet-cell" data-type="dozen" data-value="2da docena" style="grid-row: 4; grid-column: 6 / span 4;">2da Docena</button>
-    <button class="bet-cell" data-type="dozen" data-value="3ra docena" style="grid-row: 4; grid-column: 10 / span 4;">3ra Docena</button>
-    <button class="bet-cell" data-type="low" data-value="1-18" style="grid-row: 5; grid-column: 2 / span 2;">1-18</button>
-    <button class="bet-cell" data-type="parity" data-value="par" style="grid-row: 5; grid-column: 4 / span 2;">Par</button>
-    <button class="bet-cell" data-type="color" data-value="rojo" style="grid-row: 5; grid-column: 6 / span 2; background:red; color:white;">Rojo</button>
-    <button class="bet-cell" data-type="color" data-value="negro" style="grid-row: 5; grid-column: 8 / span 2; background:black; color:white;">Negro</button>
-    <button class="bet-cell" data-type="parity" data-value="impar" style="grid-row: 5; grid-column: 10 / span 2;">Impar</button>
-    <button class="bet-cell" data-type="high" data-value="19-36" style="grid-row: 5; grid-column: 12 / span 2;">19-36</button>
-  </div>
+  <!-- Tabla de Apuestas tipo casino horizontal -->
+  <div id="bet-table"></div>
 
-  <div id="chips-panel" style="margin: 16px 0;">
+  <div id="chips-panel">
     <button class="chip" data-value="10" style="background:#eee; color:#222;">10</button>
     <button class="chip" data-value="50" style="background:#f4d35e; color:#222;">50</button>
     <button class="chip" data-value="100" style="background:#ee964b; color:#222;">100</button>
     <button class="chip" data-value="500" style="background:#f95738; color:#fff;">500</button>
   </div>
   <p id="selected-chip" style="margin-bottom:10px;">Ficha seleccionada: <b>10</b></p>
-
-    <button onclick="spin()">Girar ruleta</button>
-
-
+  <p id="saldo" style="font-size:1.3rem; margin: 10px 0;">Saldo: $<b>300</b></p>
+  <button onclick="spin()">Girar ruleta</button>
   <p id="result"></p>
-  <div id="history" style="margin-top:16px; font-size:1.1rem;"></div>
 
   <script>
+    // --- DATOS Y RUEDA ---
     const svg = document.getElementById("wheel");
     const red = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
     const black = [2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35];
@@ -238,32 +218,121 @@
         svg.appendChild(text);
       }
     }
-
     drawWheel();
 
-    // Generar botones del 1 al 36
-    const numbersDiv = document.querySelector('#bet-table');
-    for (let i = 1; i <= 36; i++) {
-      const btn = document.createElement('button');
-      btn.className = 'bet-cell';
-      btn.dataset.type = 'number';
-      btn.dataset.value = i;
-      btn.textContent = i;
-      btn.style.width = '40px';
-      btn.style.height = '40px';
-      btn.style.margin = '2px';
-      btn.style.background = red.includes(i) ? 'red' : black.includes(i) ? 'black' : 'white';
-      btn.style.color = red.includes(i) ? 'white' : 'white';
-      numbersDiv.appendChild(btn);
+    // --- TABLA DE APUESTAS HORIZONTAL ---
+    const betTable = document.getElementById('bet-table');
+    betTable.innerHTML = '';
+
+    // Botón 0 (una sola celda a la izquierda)
+    const btn0 = document.createElement('button');
+    btn0.className = 'bet-cell';
+    btn0.dataset.type = 'number';
+    btn0.dataset.value = 0;
+    btn0.textContent = '0';
+    btn0.style.gridRow = '1 / span 3';
+    btn0.style.gridColumn = '1';
+    btn0.style.background = 'green';
+    btn0.style.color = 'white';
+    betTable.appendChild(btn0);
+
+    // Números 1-36 en 3 filas y 12 columnas (horizontal)
+    let num = 1;
+    for (let row = 1; row <= 3; row++) {
+      for (let col = 2; col <= 13; col++) {
+        if (num > 36) break;
+        const btn = document.createElement('button');
+        btn.className = 'bet-cell';
+        btn.dataset.type = 'number';
+        btn.dataset.value = num;
+        btn.textContent = num;
+        btn.style.gridRow = row;
+        btn.style.gridColumn = col;
+        btn.style.background = red.includes(num) ? 'red' : black.includes(num) ? 'black' : 'white';
+        btn.style.color = red.includes(num) ? 'white' : black.includes(num) ? 'white' : 'black';
+        betTable.appendChild(btn);
+        num++;
+      }
     }
 
-    let currentRotation = 0; // Agrega esto fuera de la función spin()
+    // Docenas y otras apuestas especiales (debajo de los números)
+    const specials = [
+      { type: 'dozen', value: '1ra docena', text: '1st 12', row: 4, col: 2, span: 4 },
+      { type: 'dozen', value: '2da docena', text: '2nd 12', row: 4, col: 6, span: 4 },
+      { type: 'dozen', value: '3ra docena', text: '3rd 12', row: 4, col: 10, span: 4 },
+      { type: 'low', value: '1-18', text: '1-18', row: 5, col: 2, span: 2 },
+      { type: 'parity', value: 'par', text: 'Even', row: 5, col: 4, span: 2 },
+      { type: 'color', value: 'rojo', text: '🔴', row: 5, col: 6, span: 2 },
+      { type: 'color', value: 'negro', text: '⚫', row: 5, col: 8, span: 2 },
+      { type: 'parity', value: 'impar', text: 'Odd', row: 5, col: 10, span: 2 },
+      { type: 'high', value: '19-36', text: '19-36', row: 5, col: 12, span: 2 }
+    ];
+    specials.forEach(s => {
+      const btn = document.createElement('button');
+      btn.className = 'bet-cell';
+      btn.dataset.type = s.type;
+      btn.dataset.value = s.value;
+      btn.textContent = s.text;
+      btn.style.gridRow = s.row;
+      btn.style.gridColumn = `${s.col} / span ${s.span}`;
+      betTable.appendChild(btn);
+    });
+
+    // --- FICHAS ---
+    let selectedChipValue = 10;
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', function() {
+        selectedChipValue = parseInt(this.dataset.value);
+        document.getElementById('selected-chip').innerHTML = `Ficha seleccionada: <b>${selectedChipValue}</b>`;
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+        this.classList.add('selected');
+      });
+    });
+    document.querySelector('.chip').classList.add('selected');
+
+    // --- APUESTAS Y SALDO ---
+    let saldo = 300;
+    document.getElementById("saldo").innerHTML = `Saldo: $<b>${saldo}</b>`;
     let selectedBets = [];
     let history = [];
+    let currentRotation = 0;
 
+    betTable.addEventListener('click', function(e) {
+      if (e.target.classList.contains('bet-cell')) {
+        if (saldo < selectedChipValue) {
+          alert("No tienes saldo suficiente para esa apuesta.");
+          return;
+        }
+        saldo -= selectedChipValue;
+        document.getElementById("saldo").innerHTML = `Saldo: $<b>${saldo}</b>`;
+
+        const type = e.target.dataset.type;
+        const value = e.target.dataset.value;
+        let bet = selectedBets.find(b => b.type === type && b.value === value);
+        if (bet) {
+          bet.amount += selectedChipValue;
+        } else {
+          bet = { type, value, amount: selectedChipValue };
+          selectedBets.push(bet);
+        }
+        // Mostrar la cantidad apostada en el botón (siempre el monto acumulado)
+        e.target.querySelector('.bet-amount')?.remove();
+        const span = document.createElement('span');
+        span.className = 'bet-amount';
+        span.textContent = bet.amount;
+        e.target.appendChild(span);
+
+        // Mostrar apuestas seleccionadas
+        document.getElementById("result").textContent =
+          selectedBets.length
+            ? "Apuestas: " + selectedBets.map(b => `${b.type}: ${b.value} ($${b.amount})`).join(" | ")
+            : "Selecciona tus apuestas";
+      }
+    });
+
+    // --- GIRO Y RESULTADOS ---
     function spin() {
       const resultP = document.getElementById("result");
-
       const vueltas = 6;
       const randomAngle = Math.floor(Math.random() * 360);
       currentRotation += 360 * vueltas + randomAngle;
@@ -287,37 +356,57 @@
         else if (landedNumber >= 25 && landedNumber <= 36) dozen = '3ra docena';
 
         let messages = [];
+        let totalGanado = 0;
         if (selectedBets.length === 0) {
           messages.push(`Salió el ${landedNumber}`);
         } else {
           messages = selectedBets.map(bet => {
-            let win = false;
+            let win = false, pago = 0;
             switch (bet.type) {
               case "number":
                 win = parseInt(bet.value) === landedNumber;
+                pago = 36;
                 break;
               case "color":
                 win = bet.value === color;
+                pago = 2;
                 break;
               case "parity":
                 win = landedNumber !== 0 && bet.value === parity;
+                pago = 2;
                 break;
               case "dozen":
                 win = bet.value === dozen;
+                pago = 3;
                 break;
               case "low":
                 win = landedNumber >= 1 && landedNumber <= 18;
+                pago = 2;
                 break;
               case "high":
                 win = landedNumber >= 19 && landedNumber <= 36;
+                pago = 2;
+                break;
+              case "column":
+                let colNum = parseInt(bet.value.replace('col',''));
+                win = (landedNumber !== 0) && ((landedNumber - 1) % 3 === (colNum - 1));
+                pago = 3;
                 break;
             }
+            if (win) {
+              saldo += bet.amount * pago;
+              totalGanado += bet.amount * pago;
+            }
             return win
-              ? `✅ ${bet.type} ${bet.value} ($${bet.amount}): ¡Ganaste!`
+              ? `✅ ${bet.type} ${bet.value} ($${bet.amount}): ¡Ganaste $${bet.amount * pago}!`
               : `❌ ${bet.type} ${bet.value} ($${bet.amount}): Perdiste.`;
           });
         }
         resultP.innerHTML = messages.join("<br>");
+        document.getElementById("saldo").innerHTML = `Saldo: $<b>${saldo}</b>`;
+
+        // Agregar resultado al historial
+        addToHistory(landedNumber);
 
         // Limpiar montos visuales y apuestas
         document.querySelectorAll('.bet-amount').forEach(el => el.remove());
@@ -325,53 +414,22 @@
       }, 4200);
     }
 
-    let betTable = document.getElementById('bet-table');
-    betTable.addEventListener('click', function(e) {
-      if (e.target.classList.contains('bet-cell')) {
-        const type = e.target.dataset.type;
-        const value = e.target.dataset.value;
-        let bet = selectedBets.find(b => b.type === type && b.value === value);
-        if (bet) {
-          bet.amount += selectedChipValue;
-        } else {
-          selectedBets.push({ type, value, amount: selectedChipValue });
-        }
-        // Mostrar la cantidad apostada en el botón
-        e.target.querySelector('.bet-amount')?.remove();
-        const span = document.createElement('span');
-        span.className = 'bet-amount';
-        span.style.position = 'absolute';
-        span.style.right = '2px';
-        span.style.bottom = '2px';
-        span.style.background = 'rgba(0,0,0,0.7)';
-        span.style.color = 'yellow';
-        span.style.fontSize = '0.9em';
-        span.style.padding = '1px 4px';
-        span.style.borderRadius = '6px';
-        span.textContent = bet ? bet.amount : selectedChipValue;
-        e.target.style.position = 'relative';
-        e.target.appendChild(span);
-
-        // Mostrar apuestas seleccionadas
-        document.getElementById("result").textContent =
-          selectedBets.length
-            ? "Apuestas: " + selectedBets.map(b => `${b.type}: ${b.value} ($${b.amount})`).join(" | ")
-            : "Selecciona tus apuestas";
+    // --- HISTORIAL ---
+    function addToHistory(landedNumber) {
+      const historyPile = document.getElementById("history-pile");
+      const colorClass = red.includes(landedNumber)
+        ? "red"
+        : black.includes(landedNumber)
+        ? "black"
+        : "green";
+      const chip = document.createElement("div");
+      chip.className = `history-chip ${colorClass}`;
+      chip.textContent = landedNumber;
+      historyPile.prepend(chip);
+      while (historyPile.childElementCount > 10) {
+        historyPile.lastChild.remove();
       }
-    });
-
-    // Manejo de fichas
-    let selectedChipValue = 10;
-    document.querySelectorAll('.chip').forEach(chip => {
-      chip.addEventListener('click', function() {
-        selectedChipValue = parseInt(this.dataset.value);
-        document.getElementById('selected-chip').innerHTML = `Ficha seleccionada: <b>${selectedChipValue}</b>`;
-        document.querySelectorAll('.chip').forEach(c => c.style.outline = '');
-        this.style.outline = '3px solid yellow';
-      });
-    });
-    // Selecciona la primera ficha por defecto
-    document.querySelector('.chip').style.outline = '3px solid yellow';
+    }
   </script>
 </body>
 </html>
